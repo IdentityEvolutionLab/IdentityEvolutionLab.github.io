@@ -61,7 +61,7 @@ export function PasswordDemo() {
       <Insight label={showSalted ? 'Different stored hashes' : 'Same stored hash'}>
         {showSalted ? 'The same password now yields different stored hashes. Attackers cannot reuse one precomputed lookup across every account, and matching hashes no longer reveal shared passwords.' : 'Without salts, identical passwords produce identical hashes. A precomputed table can be reused across many records.'}
       </Insight>
-      <p className="fine-print">Illustrative values only. Salts do not stop targeted guessing of weak passwords; a slow password hashing function such as Argon2id makes each guess more expensive.</p>
+      <p className="fine-print salt-caveat">Illustrative values only. Salts do not stop targeted guessing of weak passwords; a slow password hashing function such as Argon2id makes each guess more expensive.</p>
     </DemoFrame>
   </div>
 }

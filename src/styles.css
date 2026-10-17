@@ -111,3 +111,202 @@ main .jwt-encoded .jwt-header{color:#f4a381!important}main .jwt-encoded .jwt-pay
 .token-expired-result{margin-bottom:18px}
 .token-refresh-result{margin-bottom:18px}
 .token-reuse-result{margin-bottom:18px}
+
+/* Requested type scale for navigation, landing, and shared page labels. */
+.brand-text{font-size:20px}
+.nav-link,.header-action{font-size:14px}
+.header-demo{font-size:12px}
+.site-footer{font-size:12px}
+.hero-actions .btn{font-size:14px}
+.hero-description{font-size:15px}
+.hero-proof{font-size:13px}
+.evolution-preview>p{font-size:14px}
+.section-label{font-size:12px}
+.preview-item span,.preview-item strong{font-size:14px}
+.section-intro p{font-size:15px}
+.feature-card>span:last-child{font-size:14px}
+.feature-card p{font-size:13px}
+.landing-cta .btn{font-size:14px}
+.landing-cta p{font-size:13px}
+.eyebrow,.page-kicker{font-size:12px}
+
+/* About copy and the three overview descriptions. */
+.about-page p,.about-page .insight{font-size:14px}
+.audit-page .page-heading p,.architecture-page .page-heading p,.playground-page .page-heading p{font-size:16px}
+
+/* Audit labels and event list. */
+.audit-summary span:last-child{font-size:13px}
+.audit-filter button{font-size:13px}
+.event-row strong{font-size:13px}
+.event-row small,.event-meta time{font-size:11px}
+.inspector-heading{font-size:12px}
+
+/* Architecture evolution labels. */
+.architecture-switch>span{font-size:14px}
+.architecture-switch .segmented button{font-size:14px}
+.timeline-reveal strong{font-size:14px}
+.timeline-reveal p{font-size:13px}
+.timeline-stop span{font-size:11px}
+.timeline-stop strong{font-size:14px}
+
+.evolution-preview>p{margin-top:1.25rem}
+.about-page .about-hero p{font-size:16px}
+.about-hero .btn{font-size:14px}
+.audit-page .search-field input{font-size:13px}
+@media(max-width:680px){.feature-card>span:last-child{padding-top:.5rem}}
+
+/* Architecture diagram and supporting copy. */
+.architecture-page .section-heading p{font-size:15px}
+.arch-node strong{font-size:14px}
+.arch-node small,.arch-down small,.arch-connector small{font-size:12px}
+.app-stack>div{font-size:12px}
+.architecture-explain span{font-size:13px}
+.architecture-explain strong{font-size:14px}
+.architecture-explain p{font-size:13px}
+.architecture-footer .btn{font-size:14px}
+.architecture-footer p{font-size:13px}
+.domain-card>p{font-size:13px}
+.domain-top{font-size:12px}
+.domain-items span{font-size:14px}
+.domain-note{font-size:13px}
+.insight,.insight-label{font-size:14px}
+.timeline-reveal .btn{font-size:14px}
+
+/* Playground controls and request preview. */
+.playground-page .panel-heading p{font-size:13px}
+.playground-page .segmented button{font-size:13px}
+.playground-page .field-group,.playground-page .field-group>label{font-size:14px}
+.playground-page .checkbox-list code{font-size:13px}
+.playground-page .text-button{font-size:13px}
+.playground-page .request-preview strong{font-size:14px}
+.playground-page .request-preview small{font-size:12px}
+.playground-page .playground-output>.panel>.btn-primary{font-size:14px}
+.architecture-page .domain-card h2{font-size:21px}
+
+/* Keep the six evolution steps ordered and readable on narrow screens. */
+@media(min-width:681px) and (max-width:900px){
+  .architecture-timeline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:24px}
+  .timeline-stop{width:100%;min-width:0;min-height:90px}
+  .timeline-reveal{grid-column:1/-1;margin-top:10px}
+}
+@media(max-width:680px){
+  .architecture-timeline{display:flex;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:0;padding:18px}
+  .timeline-stop{display:grid;grid-template-columns:32px minmax(0,1fr);align-items:center;gap:12px;width:100%;min-width:0;margin:0 0 16px;padding:12px 14px}
+  .timeline-stop span{background:#f4f4ed;border-radius:6px;padding:7px 0;text-align:center}
+  .timeline-stop strong{min-width:0;overflow-wrap:anywhere}
+  .timeline-stop:not(:nth-last-of-type(2))::after{content:"";position:absolute;left:30px;top:100%;height:16px;border-left:1px dashed #b8b89f}
+  .timeline-stop:nth-last-of-type(2){margin-bottom:0}
+  .timeline-reveal{display:grid;grid-template-columns:40px minmax(0,1fr);align-items:start;gap:12px;margin-top:22px;padding:16px}
+  .timeline-reveal .btn{grid-column:1/-1;width:100%}
+}
+
+/* Keep Playground panels and request details aligned on narrow screens. */
+@media(max-width:900px){
+  .playground-page .playground-grid{grid-template-columns:minmax(0,1fr)}
+  .playground-page .control-panel,.playground-page .playground-output,.playground-page .playground-output>.panel{min-width:0}
+}
+@media(max-width:680px){
+  .playground-page .panel-heading>div{min-width:0}
+  .playground-page .segmented{display:flex;width:100%}
+  .playground-page .segmented button{flex:1;min-width:0;padding:8px;white-space:normal}
+  .playground-page .request-preview{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;overflow:visible}
+  .playground-page .request-preview>div{min-width:0}
+  .playground-page .request-preview>svg{justify-self:center;transform:rotate(90deg)}
+  .playground-page .playground-output>.panel>.btn-primary{width:100%}
+  .playground-page .result{flex-wrap:wrap}
+}
+
+/* Journey typography: keep explanations readable without crowding the demos. */
+.journey-shell .journey-topbar h1{font-size:29px}
+.journey-shell .journey-topbar p{font-size:14px}
+.journey-shell .progress-label,.journey-shell .stage-count{font-size:12px}
+.journey-shell .sidebar-heading{font-size:12px}
+.journey-shell .stage-group-name{font-size:11px}
+.journey-shell .stage-nav-item{font-size:14px}
+.journey-shell .stage-number{font-size:12px}
+.journey-shell .sidebar-note strong{font-size:14px}
+.journey-shell .sidebar-note p,.journey-shell .sidebar-note a{font-size:13px}
+.journey-shell .stage-heading h2{font-size:34px}
+.journey-shell .stage-heading p{font-size:15px}
+.journey-shell .stage-tabs button{font-size:14px}
+.journey-shell .demo-window-label{font-size:14px}
+.journey-shell .demo-subtitle{font-size:13px}
+.journey-shell .journey-bottom-nav>button:first-child,.journey-shell .btn{font-size:14px}
+.journey-shell .right-title{font-size:12px}
+.journey-shell .reference-question{font-size:14px}
+.journey-shell .reference-list dt{font-size:13px}
+.journey-shell .reference-list dd{font-size:12px}
+.journey-shell .right-playground{font-size:13px}
+
+/* Shared copy, feedback, and controls inside Journey stages. */
+.journey-shell .mini-heading{font-size:13px}
+.journey-shell .mini-card h3{font-size:18px}
+.journey-shell .mini-card p,.journey-shell .fine-print,.journey-shell .muted-small{font-size:13px}
+.journey-shell .mini-card code,.journey-shell .code-block pre{font-size:13px}
+.journey-shell .status,.journey-shell .code-label,.journey-shell .flow-index{font-size:12px}
+.journey-shell .flow-node,.journey-shell .text-button{font-size:13px}
+.journey-shell .result{font-size:13px}
+.journey-shell .result strong{font-size:14px}
+.journey-shell .result-code{font-size:12px}
+.journey-shell .insight,.journey-shell .insight-label{font-size:14px}
+.journey-shell .content-heading p,.journey-shell .mechanics-panel .content-heading p{font-size:14px}
+.journey-shell .mechanics-panel .explain-list p{font-size:14px}
+.journey-shell .mechanics-panel .explain-list li>span{font-size:13px}
+.journey-shell .mechanics-change small{font-size:12px}
+.journey-shell .mechanics-change p,.journey-shell .security-disclosure{font-size:14px}
+
+/* Password, sessions, and MFA. */
+.journey-shell .login-card h3{font-size:19px}
+.journey-shell .login-card>p,.journey-shell .demo-side-note p,.journey-shell .enrollment p{font-size:13px}
+.journey-shell .login-card label,.journey-shell .controls-grid label,.journey-shell .code-input-label{font-size:13px}
+.journey-shell .login-card input,.journey-shell .controls-grid select{font-size:14px}
+.journey-shell .form-hint,.journey-shell .form-error{font-size:12px}
+.journey-shell .salt-intro,.journey-shell .mfa-login-form p{font-size:13px}
+.journey-shell .salt-equation span,.journey-shell .salt-equation strong,.journey-shell .totp-formula span,.journey-shell .totp-formula strong{font-size:13px}
+.journey-shell .hash-row strong,.journey-shell .hash-row code,.journey-shell .hash-row span{font-size:13px}
+.journey-shell .session-browser code,.journey-shell .session-store dl>div{font-size:12px}
+.journey-shell .empty-store{font-size:13px}
+.journey-shell .settings-list>div{font-size:13px}
+.journey-shell .enrollment h3{font-size:17px}
+.journey-shell .mfa-login-form label{font-size:13px}
+.journey-shell .mfa-login-form input{font-size:14px}
+.journey-shell .recovery-code{font-size:13px}
+.journey-shell .recovery-code span{font-size:12px}
+
+/* Tokens, federation, passkeys, authorization, and operations. */
+.journey-shell .jwt-legend,.journey-shell .jwt-parts>div>p,.journey-shell .jwt-signing-input p{font-size:12px}
+.journey-shell .jwt-parts>div>span,.journey-shell .jwt-checklist li{font-size:12px}
+.journey-shell .signature-box,.journey-shell .claim-switch code{font-size:13px}
+.journey-shell .signature-box small{font-size:12px}
+.journey-shell .jwt-signing-input strong,.journey-shell .jwt-signing-input span,.journey-shell .token-lifecycle strong{font-size:13px}
+.journey-shell .token-lifecycle p{font-size:12px}
+.journey-shell .claim-switch button,.journey-shell .scenario-chip,.journey-shell .segmented button{font-size:13px}
+.journey-shell .actor-grid strong,.journey-shell .key-pair strong{font-size:13px}
+.journey-shell .app-card strong{font-size:14px}
+.journey-shell .actor-icon{font-size:12px}
+.journey-shell .actor-grid small,.journey-shell .key-connection span{font-size:12px}
+.journey-shell .app-card small{font-size:12px}
+.journey-shell .oauth-flow .flow-node,.journey-shell .step-detail p{font-size:13px}
+.journey-shell .step-detail .step-count{font-size:12px}
+.journey-shell .step-detail h3{font-size:18px}
+.journey-shell .permission-table{font-size:13px}
+.journey-shell .permission-table thead th,.journey-shell .permission-table code{font-size:14px}
+.journey-shell .claims-row>span,.journey-shell .ops-card strong{font-size:13px}
+.journey-shell .claims-row small,.journey-shell .ops-card p{font-size:12px}
+.journey-shell .ops-card .btn{font-size:13px}
+.journey-shell .combined-flow .flow-piece{flex:0 0 210px}
+.journey-shell .combined-flow .flow-node{min-width:0}
+.journey-shell .combined-flow .flow-node>span:last-child{min-width:0;overflow-wrap:break-word}
+.journey-shell .salt-caveat{padding-top:.75rem}
+
+@media(max-width:680px){
+  .journey-shell .journey-topbar h1{font-size:25px}
+  .journey-shell .stage-heading h2{font-size:30px}
+  .journey-shell .stage-mobile-toggle{font-size:14px}
+  .journey-shell .demo-topline,.journey-shell .journey-bottom-nav{flex-wrap:wrap}
+  .journey-shell .journey-bottom-nav .btn{margin-left:auto}
+  .journey-shell .key-pair{flex-direction:column}
+  .journey-shell .key-pair>div:not(.key-connection){min-width:0;width:100%}
+  .journey-shell .key-connection svg{transform:rotate(90deg)}
+  .journey-shell .result{flex-wrap:wrap}
+}

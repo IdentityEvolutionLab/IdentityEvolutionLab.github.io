@@ -47,7 +47,7 @@ function Header() {
   </header>
 }
 
-function Footer() { return <footer className="site-footer"><div><span className="footer-brand"><Boxes size={17} /> Identity Evolution Lab</span><span> An educational IAM simulation. No real authentication or backend.</span></div><span>Built to make identity architecture understandable.</span></footer> }
+function Footer() { return <footer className="site-footer"><div><span className="footer-brand"><Boxes size={17} /> Identity Evolution Lab</span><span> An exploratory IAM simulation. No real authentication or backend.</span></div><span>Built to make identity architecture understandable.</span></footer> }
 
 export default function App() {
   return <div className="app-shell"><PageTelemetry /><Header /><main id="main"><Routes>
