@@ -54,19 +54,25 @@ const reference: Record<StageId, { question: string, terms: { name: string, mean
     ],
   },
   oauth: {
-    question: 'How can Expense Portal gain limited API access without Alex’s password?',
+    question: 'Which check protects each part of this sign-in?',
     terms: [
-      { name: 'Authorization code', meaning: 'A short-lived value exchanged for tokens.' },
-      { name: 'State', meaning: 'Links the callback to the authorization request that started it.' },
-      { name: 'PKCE', meaning: 'Proves the code exchanger is the client that initiated the request.' },
+      { name: 'Authorization code', meaning: 'A short-lived, single-use value returned through the browser and redeemed at the token endpoint.' },
+      { name: 'State', meaning: 'Links the callback to the initiating browser’s transaction and helps reject unsolicited responses.' },
+      { name: 'PKCE', meaning: 'Binds the code to a secret verifier kept by the client; the provider compares its S256 challenge during exchange.' },
+      { name: 'Access token', meaning: 'A credential for an authorized resource server, not a standardized sign-in assertion for the client.' },
+      { name: 'Nonce', meaning: 'Links the ID token to this OIDC sign-in request.' },
+      { name: 'ID token', meaning: 'A signed identity assertion that the app validates before creating its own session.' },
     ],
   },
   oidc: {
-    question: 'How does each app know which user authenticated?',
+    question: 'Who authenticates Alex, and which app relies on that result?',
     terms: [
+      { name: 'OpenID Provider (OP)', meaning: 'The identity provider: Boo Identity authenticates Alex and issues ID tokens.' },
+      { name: 'Relying Party (RP)', meaning: 'The OIDC client app that validates its own ID token. SAML calls a comparable app a Service Provider (SP).' },
       { name: 'ID token', meaning: 'An identity assertion intended for the client application.' },
       { name: 'Nonce', meaning: 'A client-generated value checked in the ID token to bind the response.' },
       { name: 'IdP session', meaning: 'Boo Identity’s own session that can enable SSO across apps.' },
+      { name: 'App session', meaning: 'The RP’s own signed-in state, created only after it validates and maps the external identity.' },
     ],
   },
   passkeys: {

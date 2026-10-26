@@ -31,8 +31,46 @@ function PageTelemetry() {
 
 function Header() {
   const [open, setOpen] = useState(false)
+  const [hidden, setHidden] = useState(false)
   const location = useLocation()
-  return <header className="site-header">
+
+  useEffect(() => {
+    setHidden(window.scrollY > 72)
+    setOpen(false)
+  }, [location.pathname])
+
+  useEffect(() => {
+    let previousY = Math.max(window.scrollY, 0)
+    let travel = 0
+
+    function handleScroll() {
+      const currentY = Math.max(window.scrollY, 0)
+      const difference = currentY - previousY
+      previousY = currentY
+
+      if (open || currentY <= 72) {
+        travel = 0
+        setHidden(false)
+        return
+      }
+
+      if (difference <= 0) {
+        travel = 0
+        return
+      }
+
+      travel += difference
+      if (travel >= 12) {
+        setHidden(true)
+        travel = 0
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [open])
+
+  return <header className={`site-header ${hidden && !open ? 'header-hidden' : ''}`} onFocusCapture={() => setHidden(false)}>
     <div className="header-inner">
       <Link to="/" className="brand" aria-label="Identity Evolution Lab home" onClick={() => setOpen(false)}>
         <span className="brand-mark"><Fingerprint size={22} strokeWidth={1.9} /></span>
@@ -42,7 +80,7 @@ function Header() {
         {links.map(([label, path]) => <NavLink key={path} to={path} onClick={() => setOpen(false)} className={({ isActive }) => `nav-link ${isActive || (path.startsWith('/journey') && location.pathname.startsWith('/journey')) ? 'nav-active' : ''}`}>{label}</NavLink>)}
       </nav>
       <div className="header-right"><span className="header-demo"><span className="live-dot" /> Interactive simulation</span><Link className="header-action" to="/journey/password">Open lab <ArrowUpRight size={15} /></Link></div>
-      <button className="mobile-menu" onClick={() => setOpen(!open)} aria-label={open ? 'Close navigation' : 'Open navigation'} aria-expanded={open}>{open ? <X size={22} /> : <Menu size={22} />}</button>
+      <button className="mobile-menu" onClick={() => { setOpen(!open); setHidden(open && window.scrollY > 72) }} aria-label={open ? 'Close navigation' : 'Open navigation'} aria-expanded={open}>{open ? <X size={22} /> : <Menu size={22} />}</button>
     </div>
   </header>
 }

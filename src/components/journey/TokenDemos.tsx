@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { ArrowRight, KeyRound, RefreshCcw, ShieldCheck } from 'lucide-react'
 import { useLab } from '../../store/LabContext'
-import { Button, Flow, Insight, Status } from '../ui'
+import { Button, Insight, Status } from '../ui'
 import { CodeBlock, DemoFrame, Result } from './DemoPrimitives'
+import { ProtocolWalkthrough } from './ProtocolWalkthrough'
+import { combinedSteps } from './protocolSteps'
 
 type TokenScenario = 'valid' | 'expired' | 'audience' | 'signature' | 'scope'
 
@@ -114,25 +116,90 @@ export function JwtDemo() {
   </div>
 }
 
-const oauthSteps = [
-  { title: 'Request access', detail: 'Expense Portal redirects Alex to Boo Identity with client ID, registered redirect URI, requested scope, state, and PKCE challenge.' },
-  { title: 'Approve permission', detail: 'Boo Identity authenticates Alex and asks for consent to the requested API access.' },
-  { title: 'Return a code', detail: 'Boo Identity redirects the browser back with a short-lived authorization code and the original state value.' },
-  { title: 'Exchange the code', detail: 'Expense Portal sends the code and PKCE verifier to Boo Identity. The verifier must match the earlier challenge.' },
-  { title: 'Call the API', detail: 'Expense Portal sends the scoped access token to Expense API, not Alex’s password.' },
-]
+type OAuthBoundary = 'valid' | 'consent' | 'state' | 'pkce' | 'audience'
+const boundaryPhase: Record<OAuthBoundary, string> = {
+  valid: '17b', consent: '6', state: '9', pkce: '11', audience: '14',
+}
 
 export function OAuthDemo() {
   const lab = useLab()
-  const [step, setStep] = useState(-1)
-  function advance() { const next = Math.min(step + 1, oauthSteps.length - 1); setStep(next); if (next === oauthSteps.length - 1) { lab.complete('oauth'); lab.log({ type: 'OAUTH_ACCESS_GRANTED', application: 'Expense Portal', result: 'success', method: 'authorization code + PKCE', metadata: { scope: 'expenses:read', resource: 'Expense API' } }) } }
-  return <div className="demo-stack"><DemoFrame title="Expense Portal / OAuth authorization" subtitle="Follow Alex’s delegated API-access request." badge="05 / Delegation"><div className="actor-grid"><div><span className="actor-icon">01</span><strong>Alex</strong><small>Resource owner</small></div><div><span className="actor-icon">02</span><strong>Expense Portal</strong><small>Client</small></div><div><span className="actor-icon">03</span><strong>Boo Identity</strong><small>Authorization server</small></div><div><span className="actor-icon">04</span><strong>Expense API</strong><small>Resource server</small></div></div><div className="oauth-flow"><Flow steps={oauthSteps.map(item => item.title)} active={step} direction="horizontal" /></div>{step >= 0 && <div className="step-detail"><div className="step-count">STEP {String(step + 1).padStart(2, '0')} / 05</div><h3>{oauthSteps[step].title}</h3><p>{oauthSteps[step].detail}</p></div>}<div className="action-row"><Button onClick={advance} disabled={step === oauthSteps.length - 1}>{step < 0 ? 'Start authorization' : step === oauthSteps.length - 1 ? 'Access granted' : 'Continue flow'} <ArrowRight size={15} /></Button><Button variant="ghost" onClick={() => setStep(-1)}>Replay</Button></div>{step === oauthSteps.length - 1 && <Result success title="Expense Portal can call Expense API">The access token is limited to expenses:read. Alex’s password was never given to Expense Portal.</Result>}</DemoFrame><Insight label="OAuth’s job">OAuth delegates access to a resource. OpenID Connect adds a standard way for the client to learn who authenticated.</Insight></div>
+  const [step, setStep] = useState(0)
+  const [boundary, setBoundary] = useState<OAuthBoundary | null>(null)
+  const [outcome, setOutcome] = useState<'granted' | 'consent' | 'state' | 'pkce' | 'audience' | null>(null)
+
+  function runFlow() {
+    const scenario = boundary ?? 'valid'
+    setOutcome(scenario === 'valid' ? 'granted' : scenario)
+    if (scenario === 'valid') lab.complete('oauth')
+    lab.log({
+      type: scenario === 'valid' ? 'OAUTH_OIDC_FLOW_COMPLETED' : 'OAUTH_FLOW_REJECTED',
+      application: scenario === 'pkce' || scenario === 'consent' ? 'Boo Identity' : 'Expense Portal',
+      result: scenario === 'valid' ? 'success' : 'denied',
+      method: 'authorization code + PKCE + OIDC simulation',
+      metadata: { scope: 'expenses:read', resource: 'Expense API', boundary: scenario },
+    })
+  }
+
+  function selectBoundary(value: OAuthBoundary) {
+    setBoundary(value)
+    setOutcome(value === 'valid' ? 'granted' : value)
+    setStep(combinedSteps.findIndex(item => item.phase === boundaryPhase[value]))
+  }
+
+  return <div className="demo-stack">
+    <DemoFrame title="The complete sign-in and access sequence" subtitle="OAuth 2.0 + PKCE, OIDC identity, and the app session in one path." badge="05 / OAuth + OIDC">
+      <p className="protocol-simulation-note">Alex signs in to Expense Portal through Boo Identity, then the portal uses an access token at Expense API. This is an illustrative backend flow; the frontend-only lab sends no real redirects or tokens. The labels show which protocol or application owns each step.</p>
+      <ProtocolWalkthrough steps={combinedSteps} selected={step} onSelect={setStep} label="Complete OAuth and OIDC sequence" afterDetail={<div className="action-row protocol-actions">
+        <Button variant="secondary" onClick={() => setStep(value => Math.max(0, value - 1))} disabled={step === 0}>Previous handoff</Button>
+        <Button onClick={() => { if (step < combinedSteps.length - 1) setStep(step + 1); else runFlow() }}>{step === combinedSteps.length - 1 ? 'Test the complete flow' : 'Next handoff'} <ArrowRight size={15} /></Button>
+      </div>} beforeDiagram={<div className="protocol-boundary">
+        <div className="mini-heading">Try a security boundary</div>
+        <div className="scenario-row" role="group" aria-label="OAuth security check">{([
+          ['valid', 'All checks pass'], ['consent', 'Consent denied'], ['state', 'State mismatch'], ['pkce', 'Wrong PKCE verifier'], ['audience', 'Wrong ID token audience'],
+        ] as const).map(([value, label]) => <button key={value} type="button" className={`scenario-chip ${boundary === value ? 'selected' : ''}`} aria-pressed={boundary === value} onClick={() => selectBoundary(value)}>{label}</button>)}</div>
+        {!outcome && <p className="protocol-boundary-hint">Select a check to see where the flow succeeds or stops.</p>}
+        {outcome === 'granted' && <Result success title="Alex is signed in and API access is granted" code="200 OK">Expense Portal validated an ID token for its own sign-in, created a local app session, and used the separate scoped access token at Expense API.</Result>}
+        {outcome === 'consent' && <Result success={false} title="Authorization denied">Alex did not approve the requested access. Boo Identity returns an access_denied error instead of an authorization code.</Result>}
+        {outcome === 'state' && <Result success={false} title="Callback rejected">The returned state does not match this browser’s transaction. Expense Portal stops before exchanging the code.</Result>}
+        {outcome === 'pkce' && <Result success={false} title="Token request rejected">Boo Identity recomputes the challenge from the submitted verifier. It does not match the one bound to the code, so no token is issued.</Result>}
+        {outcome === 'audience' && <Result success={false} title="Sign-in rejected at the app">The ID token is addressed to another client. Expense Portal must reject it and must not create Alex’s local app session.</Result>}
+      </div>} />
+      <a className="sequence-full-link" href={`${import.meta.env.BASE_URL}oauth-oidc-sequence.svg`} target="_blank" rel="noopener noreferrer">Open the complete sequence as an image <ArrowRight size={15} aria-hidden="true" /></a>
+    </DemoFrame>
+    <Insight label="Two jobs in one journey">OAuth delegates limited API access. OIDC adds an ID token so Expense Portal can verify who signed in. The app then creates its own session. Access tokens, ID tokens, and the app session have different recipients.</Insight>
+  </div>
 }
 
 const apps = ['Expense Portal', 'HR Portal', 'Admin Console']
+const clientIds: Record<string, string> = { 'Expense Portal': 'expense-portal', 'HR Portal': 'hr-portal', 'Admin Console': 'admin-console' }
 
 export function OidcDemo() {
   const lab = useLab()
-  const [lastOpened, setLastOpened] = useState<{ app: string, mode: 'fresh' | 'sso' } | null>(null)
-  return <div className="demo-stack"><div className="two-col-cards"><div className="mini-card"><KeyRound size={20} /><h3>Access token</h3><p>Presented to an API to request a resource. Its audience is the API.</p></div><div className="mini-card accent-card"><ShieldCheck size={20} /><h3>ID token</h3><p>Presented to the client application as an identity assertion. The client validates its signature, issuer, audience, expiry, and nonce.</p></div></div><DemoFrame title="Boo Identity / Single sign-on" subtitle="Open several apps and watch Boo Identity’s session get reused." badge="06 / OIDC + SSO"><div className="app-cards">{apps.map((app, index) => <button key={app} className={`app-card ${lab.signedInApps.includes(app) ? 'app-signed-in' : ''}`} onClick={() => setLastOpened({ app, mode: lab.openApp(app) })}><span className="app-icon">{['E', 'H', 'A'][index]}</span><strong>{app}</strong><small>{lab.signedInApps.includes(app) ? 'Signed in · open again' : 'Open application'}</small></button>)}</div>{lastOpened && <Result success title={`${lastOpened.app} opened`}>{lastOpened.mode === 'fresh' ? 'Boo Identity authenticated Alex and established an IdP session.' : 'Boo Identity reused Alex’s existing IdP session, so no new credential prompt was needed.'} The app still validates its own ID token and establishes its own session.</Result>}</DemoFrame><Insight label="What SSO reuses">The shared IdP session helps later apps sign in. Each app receives a token meant for itself; one app must not treat another app’s ID token as its own.</Insight></div>
+  const [lastOpened, setLastOpened] = useState<{ app: string, mode: 'fresh' | 'sso' | 'app-session' } | null>(null)
+  const nextApp = apps.find(app => !lab.signedInApps.includes(app))
+
+  function openApp(app: string) {
+    setLastOpened({ app, mode: lab.openApp(app) })
+  }
+
+  return <div className="demo-stack">
+    <div className="two-col-cards">
+      <div className="mini-card"><KeyRound size={20} /><h3>OpenID Provider (OP)</h3><p>Boo Identity authenticates Alex, keeps the IdP session, and issues an ID token for the requesting app.</p></div>
+      <div className="mini-card accent-card"><ShieldCheck size={20} /><h3>Relying party (RP)</h3><p>Expense Portal, HR Portal, and Admin Console each validate their own ID token and create a local session. In SAML, a comparable app is called a Service Provider (SP).</p></div>
+    </div>
+    <DemoFrame title="Try single sign-on" subtitle="Open one app, then another. Boo Identity’s session can be reused." badge="06 / OIDC + SSO">
+      <div className="oidc-session-state"><Status tone={lab.idpSessionActive ? 'good' : 'neutral'}>Boo Identity session: {lab.idpSessionActive ? 'active' : 'not started'}</Status><Status>{lab.signedInApps.length} app{lab.signedInApps.length === 1 ? '' : 's'} signed in</Status></div>
+      <p className="oidc-interaction-note">{lab.signedInApps.length === 0 ? lab.idpSessionActive ? 'Alex already has a Boo Identity session. Open an application to see it reused.' : 'Open an application to see the first sign-in.' : nextApp ? `Now open ${nextApp} to see single sign-on reuse Boo Identity’s session.` : 'All three apps have their own sessions. Open one again to reuse its app session.'}</p>
+      <div className="app-cards">{apps.map((app, index) => <button key={app} className={`app-card ${lab.signedInApps.includes(app) ? 'app-signed-in' : ''}`} onClick={() => openApp(app)}><span className="app-icon">{['E', 'H', 'A'][index]}</span><strong>{app}</strong><small>{lab.signedInApps.includes(app) ? 'Signed in · open again' : 'Open application'}</small></button>)}</div>
+      {lastOpened && lab.signedInApps.includes(lastOpened.app) && <div className="oidc-handoff" aria-live="polite">
+        <div className="mini-heading">What happened when {lastOpened.app} opened</div>
+        {lastOpened.mode === 'app-session' ? <p className="oidc-returning-note">{lastOpened.app} reused its existing local session. Boo Identity did not need to issue another ID token.</p> : <div className="oidc-handoff-grid">
+          <div className="oidc-handoff-step"><span>01 · OPENID PROVIDER</span><strong>Boo Identity</strong><p>{lastOpened.mode === 'fresh' ? 'Alex signs in. Boo Identity starts a provider session.' : 'Alex’s provider session is already active. No new credential prompt.'}</p></div>
+          <div className="oidc-handoff-step oidc-token-step"><span>02 · IDENTITY PROOF</span><strong>ID token for {lastOpened.app}</strong><code>sub: alex-morgan<br />aud: {clientIds[lastOpened.app]}</code><p>Illustrative claims: the audience is this app’s registered client ID.</p></div>
+          <div className="oidc-handoff-step"><span>03 · RELYING PARTY</span><strong>{lastOpened.app}</strong><p>The app checks signature, issuer, audience, expiry, and nonce; then maps Alex and starts its own session.</p></div>
+        </div>}
+      </div>}
+    </DemoFrame>
+    <Insight label="Do not mix tokens">An ID token tells one relying party who signed in. It is not an API credential. An API checks a separate access token for allowed operations.</Insight>
+  </div>
 }

@@ -34,7 +34,7 @@ type LabContextValue = {
   revokeSession: () => void
   enableTotp: () => void
   authenticatePasskey: () => void
-  openApp: (app: string) => 'fresh' | 'sso'
+  openApp: (app: string) => 'fresh' | 'sso' | 'app-session'
   setRole: (role: Role) => void
   setScopes: (scopes: string[]) => void
   setTokenState: (state: TokenState) => void
@@ -76,11 +76,15 @@ export function LabProvider({ children }: { children: ReactNode }) {
     enableTotp: () => { setTotpEnabled(true); complete('mfa'); log({ type: 'MFA_ENROLLED', application: 'Boo Identity', result: 'success', method: 'TOTP enrollment', metadata: { factor: 'authenticator app', note: 'illustrative shared secret' } }) },
     authenticatePasskey: () => { setPasskeyEnabled(true); setIdpSessionActive(true); complete('passkeys'); log({ type: 'PASSKEY_AUTH_SUCCESS', application: 'Boo Identity', result: 'success', method: 'passkey', metadata: { proof: 'simulated signed challenge', credential: 'origin-bound' } }) },
     openApp: (app: string) => {
+      if (signedInApps.includes(app)) {
+        log({ type: 'APP_SESSION_REUSED', application: app, result: 'success', method: 'existing application session', metadata: { provider: 'Boo Identity' } })
+        return 'app-session'
+      }
       const mode = idpSessionActive ? 'sso' : 'fresh'
       setIdpSessionActive(true)
       setSignedInApps(previous => previous.includes(app) ? previous : [...previous, app])
       complete('oidc')
-      log({ type: mode === 'sso' ? 'SSO_REUSED_IDP_SESSION' : 'OIDC_LOGIN', application: app, result: 'success', method: mode === 'sso' ? 'existing IdP session' : 'simulated Boo Identity sign-in', metadata: { provider: 'Boo Identity', flow: 'authorization code + OIDC', idTokenAudience: app } })
+      log({ type: mode === 'sso' ? 'SSO_REUSED_IDP_SESSION' : 'OIDC_LOGIN', application: app, result: 'success', method: mode === 'sso' ? 'existing IdP session' : 'simulated Boo Identity sign-in', metadata: { provider: 'Boo Identity', flow: 'authorization code + OIDC', idTokenAudience: app.toLowerCase().replace(/\s+/g, '-') } })
       return mode
     },
     setRole: (next: Role) => { setRoleValue(next); log({ type: 'ROLE_CHANGED', application: 'Playground', result: 'info', method: 'simulation', metadata: { from: role, to: next } }) },
