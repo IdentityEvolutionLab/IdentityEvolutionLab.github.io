@@ -149,10 +149,10 @@ export function OAuthDemo() {
   return <div className="demo-stack">
     <DemoFrame title="The complete sign-in and access sequence" subtitle="OAuth 2.0 + PKCE, OIDC identity, and the app session in one path." badge="05 / OAuth + OIDC">
       <p className="protocol-simulation-note">Alex signs in to Expense Portal through Boo Identity, then the portal uses an access token at Expense API. This is an illustrative backend flow; the frontend-only lab sends no real redirects or tokens. The labels show which protocol or application owns each step.</p>
-      <ProtocolWalkthrough steps={combinedSteps} selected={step} onSelect={setStep} label="Complete OAuth and OIDC sequence" afterDetail={<div className="action-row protocol-actions">
+      <ProtocolWalkthrough steps={combinedSteps} selected={step} actions={<div className="action-row protocol-actions">
         <Button variant="secondary" onClick={() => setStep(value => Math.max(0, value - 1))} disabled={step === 0}>Previous handoff</Button>
         <Button onClick={() => { if (step < combinedSteps.length - 1) setStep(step + 1); else runFlow() }}>{step === combinedSteps.length - 1 ? 'Test the complete flow' : 'Next handoff'} <ArrowRight size={15} /></Button>
-      </div>} beforeDiagram={<div className="protocol-boundary">
+      </div>} boundary={<div className="protocol-boundary">
         <div className="mini-heading">Try a security boundary</div>
         <div className="scenario-row" role="group" aria-label="OAuth security check">{([
           ['valid', 'All checks pass'], ['consent', 'Consent denied'], ['state', 'State mismatch'], ['pkce', 'Wrong PKCE verifier'], ['audience', 'Wrong ID token audience'],
